@@ -72,9 +72,6 @@
 
     /* هدر اسلاید */
     .slide-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
       border-bottom: 1px solid var(--card-border);
       padding-bottom: 1.2rem;
     }
@@ -94,17 +91,6 @@
       font-weight: 800;
       color: #ffffff;
       line-height: 1.3;
-    }
-
-    .slide-badge {
-      background: var(--primary-dim);
-      border: 1px solid var(--primary);
-      color: var(--primary);
-      font-family: 'JetBrains Mono', monospace;
-      padding: 0.3rem 0.8rem;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      font-weight: 600;
     }
 
     /* محتوای میانی اسلاید */
@@ -206,53 +192,13 @@
       color: var(--text-muted);
     }
 
-    /* نویگیشن مینیمال در گوشه */
-    .nav-controls {
-      position: fixed;
-      bottom: 1.2rem;
-      left: 2rem;
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      z-index: 100;
-      background: rgba(17, 24, 39, 0.85);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--card-border);
-      padding: 0.4rem 0.8rem;
-      border-radius: 30px;
-    }
-
-    .nav-btn {
-      background: none;
-      border: none;
-      color: var(--text);
-      font-size: 1.1rem;
-      cursor: pointer;
-      padding: 0.2rem 0.5rem;
-      border-radius: 4px;
-      transition: color 0.2s;
-    }
-
-    .nav-btn:hover {
-      color: var(--primary);
-    }
-
-    .page-indicator {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-
-    /* استایل اختصاصی برای چاپ و تبدیل تمیز به PDF/پاورپوینت */
+    /* استایل اختصاصی چاپ برای تبدیل مستقیم به PDF/پاورپوینت */
     @media print {
       body {
         overflow: visible !important;
         background: #090d16 !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
-      }
-      .nav-controls {
-        display: none !important;
       }
       .deck-container {
         height: auto !important;
@@ -277,11 +223,8 @@
     <!-- اسلاید ۱: تایتل -->
     <section class="slide active">
       <div class="slide-header">
-        <div>
-          <span class="slide-tag">دانشگاه مهندسی کامپیوتر • درس مبانی رایانش امن</span>
-          <h1 class="slide-title">مهندسی معکوس و ارزیابی شبکه با Nmap</h1>
-        </div>
-        <span class="slide-badge">v7.9x Network Recon</span>
+        <span class="slide-tag">دانشگاه مهندسی کامپیوتر • درس مبانی رایانش امن</span>
+        <h1 class="slide-title">مهندسی معکوس و ارزیابی شبکه با Nmap</h1>
       </div>
       <div class="slide-content">
         <div class="card card-accent-cyan" style="padding: 2.5rem; text-align: center;">
@@ -303,18 +246,15 @@
       </div>
       <div class="slide-footer">
         <span>مدت زمان ارائه: ۱۵ دقیقه</span>
-        <span>استفاده از کلیدهای ➔ و ⬅ برای جابجایی</span>
+        <span>مبانی رایانش امن</span>
       </div>
     </section>
 
     <!-- اسلاید ۲: جایگاه Nmap -->
     <section class="slide">
       <div class="slide-header">
-        <div>
-          <span class="slide-tag">معماری ابزار و متدولوژی</span>
-          <h2 class="slide-title">جایگاه Nmap در چرخه امنیت (Cyber Kill Chain)</h2>
-        </div>
-        <span class="slide-badge">Phase 1: Reconnaissance</span>
+        <span class="slide-tag">معماری ابزار و متدولوژی</span>
+        <h2 class="slide-title">جایگاه Nmap در چرخه امنیت (Cyber Kill Chain)</h2>
       </div>
       <div class="slide-content">
         <div class="grid-2">
@@ -345,11 +285,8 @@
     <!-- اسلاید ۳: وضعیت‌های شش‌گانه پورت -->
     <section class="slide">
       <div class="slide-header">
-        <div>
-          <span class="slide-tag">استاندارد لایه انتقال</span>
-          <h2 class="slide-title">وضعیت‌های شش‌گانه درگاه‌ها بر اساس RFC 793</h2>
-        </div>
-        <span class="slide-badge">TCP RFC 793 Specification</span>
+        <span class="slide-tag">استاندارد لایه انتقال</span>
+        <h2 class="slide-title">وضعیت‌های شش‌گانه درگاه‌ها بر اساس RFC 793</h2>
       </div>
       <div class="slide-content">
         <div class="grid-3">
@@ -388,11 +325,8 @@
     <!-- اسلاید ۴: TCP Connect vs SYN Scan -->
     <section class="slide">
       <div class="slide-header">
-        <div>
-          <span class="slide-tag">کالبدشکافی لایه ترنسپورت</span>
-          <h2 class="slide-title">اسکن TCP Connect در برابر SYN Stealth</h2>
-        </div>
-        <span class="slide-badge">Flags: SYN, ACK, RST</span>
+        <span class="slide-tag">کالبدشکافی لایه ترنسپورت</span>
+        <h2 class="slide-title">اسکن TCP Connect در برابر SYN Stealth</h2>
       </div>
       <div class="slide-content">
         <div class="grid-2">
@@ -433,11 +367,8 @@
     <!-- اسلاید ۵: اسکن‌های غیرمتعارف -->
     <section class="slide">
       <div class="slide-header">
-        <div>
-          <span class="slide-tag">بهره‌برداری از باگ‌های پروتکل</span>
-          <h2 class="slide-title">اسکن‌های معکوس و نقض استاندارد RFC 793</h2>
-        </div>
-        <span class="slide-badge">Stealth Inverted Scans</span>
+        <span class="slide-tag">بهره‌برداری از باگ‌های پروتکل</span>
+        <h2 class="slide-title">اسکن‌های معکوس و نقض استاندارد RFC 793</h2>
       </div>
       <div class="slide-content">
         <div class="grid-3">
@@ -472,11 +403,8 @@
     <!-- اسلاید ۶: چالش UDP -->
     <section class="slide">
       <div class="slide-header">
-        <div>
-          <span class="slide-tag">پروتکل‌های بدون اتصال</span>
-          <h2 class="slide-title">چالش اسکن پروتکل UDP (<code>-sU</code>)</h2>
-        </div>
-        <span class="slide-badge">Connectionless & Rate Limiting</span>
+        <span class="slide-tag">پروتکل‌های بدون اتصال</span>
+        <h2 class="slide-title">چالش اسکن پروتکل UDP (<code>-sU</code>)</h2>
       </div>
       <div class="slide-content">
         <div class="grid-2">
@@ -511,11 +439,8 @@
     <!-- اسلاید ۷: تشخیص سیستم‌عامل -->
     <section class="slide">
       <div class="slide-header">
-        <div>
-          <span class="slide-tag">انگشت‌نگاری لایه شبکه</span>
-          <h2 class="slide-title">متدولوژی اثر انگشت‌نگاری سیستم‌عامل (<code>-O</code>)</h2>
-        </div>
-        <span class="slide-badge">TCP/IP Stack Fingerprinting</span>
+        <span class="slide-tag">انگشت‌نگاری لایه شبکه</span>
+        <h2 class="slide-title">متدولوژی اثر انگشت‌نگاری سیستم‌عامل (<code>-O</code>)</h2>
       </div>
       <div class="slide-content">
         <div class="grid-2">
@@ -551,11 +476,8 @@
     <!-- اسلاید ۸: موتور اسکریپت‌نویسی NSE -->
     <section class="slide">
       <div class="slide-header">
-        <div>
-          <span class="slide-tag">اتوماسیون ارزیابی امنیتی</span>
-          <h2 class="slide-title">موتور اسکریپت‌نویسی Nmap (NSE Engine)</h2>
-        </div>
-        <span class="slide-badge">Embedded Lua Engine</span>
+        <span class="slide-tag">اتوماسیون ارزیابی امنیتی</span>
+        <h2 class="slide-title">موتور اسکریپت‌نویسی Nmap (NSE Engine)</h2>
       </div>
       <div class="slide-content">
         <div class="grid-3">
@@ -596,11 +518,8 @@
     <!-- اسلاید ۹: تکنیک‌های دور زدن فایروال و IDS -->
     <section class="slide">
       <div class="slide-header">
-        <div>
-          <span class="slide-tag">مهار مانیتورینگ امنیتی</span>
-          <h2 class="slide-title">تکنیک‌های فریب فایروال و IDS (Evasion Tactics)</h2>
-        </div>
-        <span class="slide-badge">IDS/IPS Bypass</span>
+        <span class="slide-tag">مهار مانیتورینگ امنیتی</span>
+        <h2 class="slide-title">تکنیک‌های فریب فایروال و IDS (Evasion Tactics)</h2>
       </div>
       <div class="slide-content">
         <div class="grid-2">
@@ -630,11 +549,8 @@
     <!-- اسلاید ۱۰: دیدگاه دفاعی بلو تیم -->
     <section class="slide">
       <div class="slide-header">
-        <div>
-          <span class="slide-tag">دیدگاه تیم مدافع (Blue Team)</span>
-          <h2 class="slide-title">رهگیری و مهار اسکنرهای Nmap در سطح شبکه</h2>
-        </div>
-        <span class="slide-badge">Detection & Hardening</span>
+        <span class="slide-tag">دیدگاه تیم مدافع (Blue Team)</span>
+        <h2 class="slide-title">رهگیری و مهار اسکنرهای Nmap در سطح شبکه</h2>
       </div>
       <div class="slide-content">
         <div class="grid-2">
@@ -668,11 +584,8 @@
     <!-- اسلاید ۱۱: نتیجه‌گیری و سوال تعاملی -->
     <section class="slide">
       <div class="slide-header">
-        <div>
-          <span class="slide-tag">جمع‌بندی و نتیجه‌گیری نهایی</span>
-          <h2 class="slide-title">نتیجه‌گیری و پرسش تعاملی کلاسی</h2>
-        </div>
-        <span class="slide-badge">Final Q & A</span>
+        <span class="slide-tag">جمع‌بندی و نتیجه‌گیری نهایی</span>
+        <h2 class="slide-title">نتیجه‌گیری و پرسش تعاملی کلاسی</h2>
       </div>
       <div class="slide-content">
         <div class="card card-accent-cyan" style="padding: 2rem;">
@@ -696,27 +609,14 @@
 
   </div>
 
-  <!-- کنترل‌های کیبورد و دکمه‌های مینیمال -->
-  <div class="nav-controls">
-    <button class="nav-btn" id="prevBtn" title="اسلاید قبلی">➔</button>
-    <span class="page-indicator" id="indicator">01 / 11</span>
-    <button class="nav-btn" id="nextBtn" title="اسلاید بعدی">⬅</button>
-  </div>
-
   <script>
     const slides = document.querySelectorAll('.slide');
-    const indicator = document.getElementById('indicator');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
     let currentIndex = 0;
 
     function updateSlide(index) {
       slides.forEach((slide, i) => {
         slide.classList.toggle('active', i === index);
       });
-      const currentNum = String(index + 1).padStart(2, '0');
-      const totalNum = String(slides.length).padStart(2, '0');
-      indicator.textContent = `${currentNum} / ${totalNum}`;
     }
 
     function nextSlide() {
@@ -733,17 +633,14 @@
       }
     }
 
-    // کنترل با کیبورد
+    // کنترل تمیز فقط با کلیدهای کیبورد
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft' || e.key === 'PageDown' || e.key === ' ') {
+      if (e.key === 'ArrowLeft' || e.key === 'PageDown' || e.key === ' ' || e.key === 'ArrowDown') {
         nextSlide();
-      } else if (e.key === 'ArrowRight' || e.key === 'PageUp') {
+      } else if (e.key === 'ArrowRight' || e.key === 'PageUp' || e.key === 'ArrowUp') {
         prevSlide();
       }
     });
-
-    nextBtn.addEventListener('click', nextSlide);
-    prevBtn.addEventListener('click', prevSlide);
   </script>
 </body>
 </html>
