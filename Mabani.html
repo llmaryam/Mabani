@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ارائه جامع Nmap - مبانی رایانش امن</title>
+  <!-- فونت وزیرمتن -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #111827;
+      --card-border: #1f2937;
+      --primary: #00ffcc;
+      --primary-dim: rgba(0, 255, 204, 0.12);
+      --secondary: #38bdf8;
+      --accent: #f43f5e;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --code-bg: #050811;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Vazirmatn', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* کانتینر اصلی اسلایدها */
+    .deck-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 3.5rem 5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease-in-out, transform 0.35s ease-in-out;
+      transform: translateY(12px);
+      background: radial-gradient(circle at 85% 15%, rgba(0, 255, 204, 0.05) 0%, transparent 50%),
+                  radial-gradient(circle at 15% 85%, rgba(56, 189, 248, 0.05) 0%, transparent 50%),
+                  var(--bg);
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateY(0);
+    }
+
+    /* هدر اسلاید */
+    .slide-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 1.2rem;
+    }
+
+    .slide-tag {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: inline-block;
+      margin-bottom: 0.4rem;
+    }
+
+    .slide-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.3;
+    }
+
+    .slide-badge {
+      background: var(--primary-dim);
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      font-family: 'JetBrains Mono', monospace;
+      padding: 0.3rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    /* محتوای میانی اسلاید */
+    .slide-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+
+    /* گریدها */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.2rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 1.4rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+
+    .card-accent-cyan { border-top: 3px solid var(--primary); }
+    .card-accent-blue { border-top: 3px solid var(--secondary); }
+    .card-accent-red  { border-top: 3px solid var(--accent); }
+
+    .card h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.7rem;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card p, .card li {
+      color: var(--text-muted);
+      font-size: 0.98rem;
+      line-height: 1.7;
+    }
+
+    .card ul {
+      list-style-type: none;
+    }
+
+    .card ul li {
+      position: relative;
+      padding-right: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .card ul li::before {
+      content: "•";
+      color: var(--primary);
+      font-size: 1.4rem;
+      position: absolute;
+      right: 0;
+      top: -4px;
+    }
+
+    /* جعبه کدها */
+    .code-box {
+      background: var(--code-bg);
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 0.8rem 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      color: #38bdf8;
+      direction: ltr;
+      text-align: left;
+      margin-top: 0.7rem;
+    }
+
+    .code-box span.cmd { color: #f43f5e; font-weight: 600; }
+    .code-box span.arg { color: #00ffcc; }
+
+    /* فوتر اسلاید */
+    .slide-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--card-border);
+      padding-top: 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* نویگیشن مینیمال در گوشه */
+    .nav-controls {
+      position: fixed;
+      bottom: 1.2rem;
+      left: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      z-index: 100;
+      background: rgba(17, 24, 39, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--card-border);
+      padding: 0.4rem 0.8rem;
+      border-radius: 30px;
+    }
+
+    .nav-btn {
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      transition: color 0.2s;
+    }
+
+    .nav-btn:hover {
+      color: var(--primary);
+    }
+
+    .page-indicator {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* استایل اختصاصی برای چاپ و تبدیل تمیز به PDF/پاورپوینت */
+    @media print {
+      body {
+        overflow: visible !important;
+        background: #090d16 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .nav-controls {
+        display: none !important;
+      }
+      .deck-container {
+        height: auto !important;
+      }
+      .slide {
+        position: relative !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        opacity: 1 !important;
+        transform: none !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        display: flex !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="deck-container">
+
+    <!-- اسلاید ۱: تایتل -->
+    <section class="slide active">
+      <div class="slide-header">
+        <div>
+          <span class="slide-tag">دانشگاه مهندسی کامپیوتر • درس مبانی رایانش امن</span>
+          <h1 class="slide-title">مهندسی معکوس و ارزیابی شبکه با Nmap</h1>
+        </div>
+        <span class="slide-badge">v7.9x Network Recon</span>
+      </div>
+      <div class="slide-content">
+        <div class="card card-accent-cyan" style="padding: 2.5rem; text-align: center;">
+          <h2 style="font-size: 1.8rem; color: #fff; margin-bottom: 1rem;">کالبدشکافی پروتکل‌ها، تکنیک‌های اسکن و استراتژی‌های دفاعی</h2>
+          <p style="font-size: 1.15rem; max-width: 850px; margin: 0 auto; color: var(--text-muted);">
+            بررسی جامع سطح حمله (Attack Surface)، تزریق بسته‌های خام در لایه‌های ۳ و ۴، دست‌تکانی سه‌مرحله‌ای، دور زدن IDS/فایروال و متدهای کشف سیستم‌عامل
+          </p>
+          <div style="margin-top: 2rem; display: flex; justify-content: center; gap: 2rem;">
+            <div style="text-align: right;">
+              <span style="font-size: 0.85rem; color: var(--primary);">موضوع تحقیق:</span>
+              <div style="font-weight: 700;">ابزارشناسی امنیت سایبری (کالی لینوکس)</div>
+            </div>
+            <div style="text-align: right; border-right: 1px solid var(--card-border); padding-right: 2rem;">
+              <span style="font-size: 0.85rem; color: var(--secondary);">ارائه‌دهنده:</span>
+              <div style="font-weight: 700;">دانشجوی مهندسی کامپیوتر</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>مدت زمان ارائه: ۱۵ دقیقه</span>
+        <span>استفاده از کلیدهای ➔ و ⬅ برای جابجایی</span>
+      </div>
+    </section>
+
+    <!-- اسلاید ۲: جایگاه Nmap -->
+    <section class="slide">
+      <div class="slide-header">
+        <div>
+          <span class="slide-tag">معماری ابزار و متدولوژی</span>
+          <h2 class="slide-title">جایگاه Nmap در چرخه امنیت (Cyber Kill Chain)</h2>
+        </div>
+        <span class="slide-badge">Phase 1: Reconnaissance</span>
+      </div>
+      <div class="slide-content">
+        <div class="grid-2">
+          <div class="card card-accent-blue">
+            <h3>شناسایی فعال در برابر شناسایی غیرفعال</h3>
+            <ul>
+              <li><strong>Passive Recon:</strong> جمع‌آوری داده بدون لمس فیزیکی سرور هدف (OSINT، رکوردهای DNS، Whois).</li>
+              <li><strong>Active Recon (محیط Nmap):</strong> برقراری اتصال مستقیم لایه شبکه و ترنسپورت جهت نقشه‌برداری توپولوژی.</li>
+              <li>هدف بنیادین: پیدا کردن <strong>سطح حمله (Attack Surface)</strong> و درگاه‌های بدون محافظ.</li>
+            </ul>
+          </div>
+          <div class="card card-accent-cyan">
+            <h3>چرا ان‌مپ منحصر‌به‌فرد است؟ (Raw Sockets)</h3>
+            <ul>
+              <li>عدم وابستگی به رابط سوکت استاندارد سیستم‌عامل (عدم محدودیت به تابع <code>connect()</code>).</li>
+              <li>استفاده مستقیم از درایور <strong>libpcap</strong> برای جعل و دستکاری بیت‌های هدر بسته در لایه ۲، ۳ و ۴.</li>
+              <li>امکان سفارشی‌سازی فلگ‌های TCP، اندازه‌های Window Size، زمان انقضا (TTL) و آدرس‌های مبدا.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>مبانی رایانش امن</span>
+        <span>بخش ۱: مبانی تئوریک شبکه</span>
+      </div>
+    </section>
+
+    <!-- اسلاید ۳: وضعیت‌های شش‌گانه پورت -->
+    <section class="slide">
+      <div class="slide-header">
+        <div>
+          <span class="slide-tag">استاندارد لایه انتقال</span>
+          <h2 class="slide-title">وضعیت‌های شش‌گانه درگاه‌ها بر اساس RFC 793</h2>
+        </div>
+        <span class="slide-badge">TCP RFC 793 Specification</span>
+      </div>
+      <div class="slide-content">
+        <div class="grid-3">
+          <div class="card card-accent-cyan">
+            <h3>Open</h3>
+            <p>سرویس در حال گوش دادن (Listen) است. پکت‌های درخواست پذیرفته شده و پاسخ مثبت برمی‌گردانند.</p>
+          </div>
+          <div class="card card-accent-red">
+            <h3>Closed</h3>
+            <p>هیچ پروسه‌ای روی پورت گوش نمی‌دهد؛ طبق استاندارد، بسته ریست (RST) به مبدا بازگردانده می‌شود.</p>
+          </div>
+          <div class="card card-accent-blue">
+            <h3>Filtered</h3>
+            <p>فایروال پکت را مسدود (Drop) کرده یا پیام خطای اداری ICMP (Type 3 Code 13) تولید کرده است.</p>
+          </div>
+          <div class="card">
+            <h3>Unfiltered</h3>
+            <p>پورت در دسترس است اما ان‌مپ نمی‌تواند باز یا بسته بودنش را قطعی کند (رایج در اسکن‌های ACK).</p>
+          </div>
+          <div class="card">
+            <h3>Open | Filtered</h3>
+            <p>پاسخی برنگشته است؛ ان‌مپ نمی‌داند پورت باز است و پاسخ گم شده، یا فایروال مسیر را بسته است.</p>
+          </div>
+          <div class="card">
+            <h3>Closed | Filtered</h3>
+            <p>عدم توانایی در تفکیک پورت بسته و فیلتر شده (مختص اسکن‌های خاص مثل Idle Scan).</p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>مبانی رایانش امن</span>
+        <span>بخش ۲: تحلیل وضعیت درگاه‌ها</span>
+      </div>
+    </section>
+
+    <!-- اسلاید ۴: TCP Connect vs SYN Scan -->
+    <section class="slide">
+      <div class="slide-header">
+        <div>
+          <span class="slide-tag">کالبدشکافی لایه ترنسپورت</span>
+          <h2 class="slide-title">اسکن TCP Connect در برابر SYN Stealth</h2>
+        </div>
+        <span class="slide-badge">Flags: SYN, ACK, RST</span>
+      </div>
+      <div class="slide-content">
+        <div class="grid-2">
+          <div class="card card-accent-blue">
+            <h3>۱. TCP Connect Scan (<code>-sT</code>)</h3>
+            <ul>
+              <li>ایجاد اتصال کامل با اجرای کامل <strong>3-Way Handshake</strong>.</li>
+              <li>تکمیل سوکت در لایه Application (ثبت قطعی در لاگ سرورها).</li>
+              <li>نیازی به دسترسی Root یا کاربر ارشد لینوکس ندارد.</li>
+            </ul>
+            <div class="code-box">
+              <span class="cmd">Client</span> ➔ [SYN] ➔ <span class="arg">Target</span><br>
+              <span class="cmd">Client</span> ⬅ [SYN/ACK] ⬅ <span class="arg">Target</span><br>
+              <span class="cmd">Client</span> ➔ [ACK] ➔ <span class="arg">Target (اتصال کامل)</span>
+            </div>
+          </div>
+          <div class="card card-accent-cyan">
+            <h3>۲. SYN Stealth Scan (<code>-sS</code>)</h3>
+            <ul>
+              <li>اسکن نیمه‌باز (Half-Open)؛ پیش‌فرض محبوب Nmap.</li>
+              <li>قطع یکباره ارتباط با ارسال فلگ <strong>RST</strong> پیش از ایجاد سشن.</li>
+              <li>عدم ثبت در لاگ‌های وب‌سرورهای قدیمی؛ نیازمند دسترسی Root.</li>
+            </ul>
+            <div class="code-box">
+              <span class="cmd">Client</span> ➔ [SYN] ➔ <span class="arg">Target</span><br>
+              <span class="cmd">Client</span> ⬅ [SYN/ACK] ⬅ <span class="arg">Target (Open)</span><br>
+              <span class="cmd">Client</span> ➔ <span class="cmd">[RST]</span> ➔ <span class="arg">Target (قطع فوری!)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>مبانی رایانش امن</span>
+        <span>بخش ۳: مکانیزم‌های اسکن لایه ۴</span>
+      </div>
+    </section>
+
+    <!-- اسلاید ۵: اسکن‌های غیرمتعارف -->
+    <section class="slide">
+      <div class="slide-header">
+        <div>
+          <span class="slide-tag">بهره‌برداری از باگ‌های پروتکل</span>
+          <h2 class="slide-title">اسکن‌های معکوس و نقض استاندارد RFC 793</h2>
+        </div>
+        <span class="slide-badge">Stealth Inverted Scans</span>
+      </div>
+      <div class="slide-content">
+        <div class="grid-3">
+          <div class="card card-accent-cyan">
+            <h3>NULL Scan (<code>-sN</code>)</h3>
+            <p>ارسال بسته‌ای که مقدار تمامی بیت‌های هدر TCP آن برابر با <strong>0x00</strong> است (هیچ فلگی روشن نیست).</p>
+          </div>
+          <div class="card card-accent-blue">
+            <h3>FIN Scan (<code>-sF</code>)</h3>
+            <p>ارسال بسته‌ای که تنها فلگ <strong>FIN</strong> در آن فعال است بدون اینکه قبل از آن ترافیکی ردوبدل شده باشد.</p>
+          </div>
+          <div class="card card-accent-red">
+            <h3>Xmas Scan (<code>-sX</code>)</h3>
+            <p>فعال‌سازی همزمان فلگ‌های <strong>FIN, PSH, URG</strong> (روشن شدن فلگ‌ها شبیه به چراغ‌های درخت کریسمس!).</p>
+          </div>
+        </div>
+        <div class="card" style="margin-top: 0.5rem;">
+          <h3 style="color: var(--primary);">حفره منطقی و رفتار پشته شبکه ویندوز:</h3>
+          <p>
+            طبق استاندارد RFC 793، اگر پورت <strong>بسته</strong> باشد باید بسته <code>RST</code> بفرستد، و اگر پورت <strong>باز</strong> باشد باید بسته غیرعادی را بدون پاسخ دور بیندازد (Drop).
+            <br>
+            <strong style="color: var(--accent);">استثنای سیستم‌عامل مایکروسافت:</strong> ویندوز، سیسکو و BSD این بند از RFC را نقض می‌کنند و در هر دو حالت پورت باز و بسته پاسخ <code>RST</code> می‌دهند! همین تفاوت کلید تفکیک لینوکس از ویندوز است.
+          </p>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>مبانی رایانش امن</span>
+        <span>بخش ۴: تحلیل اسکن‌های نامتعارف</span>
+      </div>
+    </section>
+
+    <!-- اسلاید ۶: چالش UDP -->
+    <section class="slide">
+      <div class="slide-header">
+        <div>
+          <span class="slide-tag">پروتکل‌های بدون اتصال</span>
+          <h2 class="slide-title">چالش اسکن پروتکل UDP (<code>-sU</code>)</h2>
+        </div>
+        <span class="slide-badge">Connectionless & Rate Limiting</span>
+      </div>
+      <div class="slide-content">
+        <div class="grid-2">
+          <div class="card card-accent-blue">
+            <h3>چرا اسکن UDP پیچیده و مبهم است؟</h3>
+            <ul>
+              <li>پروتکل UDP هیچ دست‌تکانی و تاییدی ندارد (Fire-and-forget).</li>
+              <li>پورت‌های باز عموماً به پکت‌های پوچ و خالی هیچ پاسخی نمی‌دهند.</li>
+              <li>پاسخ نگرفتن ان‌مپ به معنای باز بودن پورت یا بلاک شدن بسته توسط فایروال است (وضعیت <code>Open|Filtered</code>).</li>
+              <li>در صورت بسته بودن، سیستم پیام <strong>ICMP Port Unreachable (Type 3 Code 3)</strong> تولید می‌کند.</li>
+            </ul>
+          </div>
+          <div class="card card-accent-red">
+            <h3>معضل نرخ محدودیت (Rate Limiting) در هسته لینوکس</h3>
+            <ul>
+              <li>هسته سیستم‌عامل‌ها برای جلوگیری از حملات DoS، ارسال بسته‌های خطای ICMP را به شدت محدود می‌کنند.</li>
+              <li>برای مثال، کرنل لینوکس تنها اجازه ارسال یک بسته ICMP در هر ثانیه را می‌دهد.</li>
+              <li><strong>نتیجه عملی:</strong> اسکن کامل ۶۵,۵۳۵ درگاه UDP ممکن است تا **۱۸ ساعت** زمان ببرد!</li>
+            </ul>
+            <div class="code-box">
+              <span class="cmd">sudo nmap</span> <span class="arg">-sU -p 53,161,67</span> target.local
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>مبانی رایانش امن</span>
+        <span>بخش ۵: پروتکل‌های بدون اتصال</span>
+      </div>
+    </section>
+
+    <!-- اسلاید ۷: تشخیص سیستم‌عامل -->
+    <section class="slide">
+      <div class="slide-header">
+        <div>
+          <span class="slide-tag">انگشت‌نگاری لایه شبکه</span>
+          <h2 class="slide-title">متدولوژی اثر انگشت‌نگاری سیستم‌عامل (<code>-O</code>)</h2>
+        </div>
+        <span class="slide-badge">TCP/IP Stack Fingerprinting</span>
+      </div>
+      <div class="slide-content">
+        <div class="grid-2">
+          <div class="card card-accent-cyan">
+            <h3>مؤلفه‌های تشخیص هویت سیستم‌عامل</h3>
+            <ul>
+              <li><strong>الگوی شماره سریال اول (ISN):</strong> الگوریتم تولید مقادیر تصادفی در ویندوز و لینوکس متفاوت است.</li>
+              <li><strong>تحلیل گزینه‌های هدر TCP (Options):</strong> ترتیب فیلدهای MSS, SACK, WScale و ترازهای بایت.</li>
+              <li><strong>مقدار پیش‌فرض TTL:</strong> ویندوز معمولاً از ۱۲۸ و توزیع‌های لینوکس از ۶۴ شروع می‌کنند.</li>
+              <li><strong>اندازه پنجره دریافت (Window Size):</strong> مقادیر بافرهای اولیه سیستم‌ها تفاوت امضایی دارد.</li>
+            </ul>
+          </div>
+          <div class="card card-accent-blue">
+            <h3>دیتابیس امضاهای Nmap: <code>nmap-os-db</code></h3>
+            <p>
+              ان‌مپ مجموعه‌ای از تست‌های دقیق ریاضی روی هدرهای بازگشتی انجام داده و پاسخ را با بیش از ۵۰۰۰ امضای ثبت شده در دیتابیس خود مقایسه می‌کند تا نوع سیستم‌عامل و ویرایش کرنل را مشخص کند.
+            </p>
+            <div class="code-box">
+              <span class="cmd">sudo nmap</span> <span class="arg">-O --osscan-guess</span> 192.168.1.50
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
+              نمونه خروجی: <code>OS: Linux 5.4 - 5.15 (98% match)</code>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>مبانی رایانش امن</span>
+        <span>بخش ۶: انگشت‌نگاری کرنل</span>
+      </div>
+    </section>
+
+    <!-- اسلاید ۸: موتور اسکریپت‌نویسی NSE -->
+    <section class="slide">
+      <div class="slide-header">
+        <div>
+          <span class="slide-tag">اتوماسیون ارزیابی امنیتی</span>
+          <h2 class="slide-title">موتور اسکریپت‌نویسی Nmap (NSE Engine)</h2>
+        </div>
+        <span class="slide-badge">Embedded Lua Engine</span>
+      </div>
+      <div class="slide-content">
+        <div class="grid-3">
+          <div class="card card-accent-red">
+            <h3>دسته‌بندی Vuln</h3>
+            <p>کشف و راستی‌آزمایی آسیب‌پذیری‌های معین شبکه با کدهای CVE (مانند EternalBlue و Log4j).</p>
+            <div class="code-box">
+              <span class="arg">--script</span> <span class="cmd">vuln</span>
+            </div>
+          </div>
+          <div class="card card-accent-cyan">
+            <h3>دسته‌بندی Auth</h3>
+            <p>بررسی امنیت نشست‌ها، رمزهای پیش‌فرض و بای‌پس کردن سامانه‌های احراز هویت سرویس‌ها.</p>
+            <div class="code-box">
+              <span class="arg">--script</span> <span class="cmd">auth</span>
+            </div>
+          </div>
+          <div class="card card-accent-blue">
+            <h3>دسته‌بندی Discovery</h3>
+            <p>پرس‌وجو از ساختار درونی سرویس‌ها، خواندن رکوردهای LDAP، مسیرهای وب و اشتراک‌های SMB.</p>
+            <div class="code-box">
+              <span class="arg">--script</span> <span class="cmd">discovery</span>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-top: 0.5rem;">
+          <p>
+            <strong>زبان اسکریپت‌نویسی:</strong> موتور داخلی به زبان فوق‌العاده سبک <strong>Lua</strong> نوشته شده که امکان اجرای تست نفوذ مقدماتی در کسری از ثانیه را بدون باز کردن ابزارهای حجیم فراهم می‌آورد.
+          </p>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>مبانی رایانش امن</span>
+        <span>بخش ۷: موتور اسکریپت‌نویسی</span>
+      </div>
+    </section>
+
+    <!-- اسلاید ۹: تکنیک‌های دور زدن فایروال و IDS -->
+    <section class="slide">
+      <div class="slide-header">
+        <div>
+          <span class="slide-tag">مهار مانیتورینگ امنیتی</span>
+          <h2 class="slide-title">تکنیک‌های فریب فایروال و IDS (Evasion Tactics)</h2>
+        </div>
+        <span class="slide-badge">IDS/IPS Bypass</span>
+      </div>
+      <div class="slide-content">
+        <div class="grid-2">
+          <div class="card card-accent-red">
+            <h3>۱. قطعه‌قطعه کردن بسته‌ها (<code>-f</code> / <code>--mtu</code>)</h3>
+            <p>شکستن هدر TCP به قطعات ریز ۸ بایتی برای فریب فایروال‌های بدون حالت (Stateless) که کل بسته را تجمیع نمی‌کنند.</p>
+            <h3>۲. سیستم‌های فریب دکووی (<code>-D</code>)</h3>
+            <p>جعل همزمان ده‌ها آدرس IP فرستنده تا ادمین شبکه نتواند مبدا اصلی نفوذ را از میان ترافیک جعلی تفکیک کند.</p>
+            <div class="code-box">
+              <span class="cmd">sudo nmap</span> <span class="arg">-D RND:10,ME</span> target.com
+            </div>
+          </div>
+          <div class="card card-accent-blue">
+            <h3>۳. دستکاری پورت مبدا (<code>--source-port 53</code>)</h3>
+            <p>ارسال ترافیک با ماسک پورت DNS (پورت ۵۳) یا DHCP برای عبور از فایروال‌هایی با کانفیگ ضعیف.</p>
+            <h3>۴. الگوهای زمان‌بندی (Timing <code>-T0</code> تا <code>-T5</code>)</h3>
+            <p>استفاده از حالت <code>-T0 (Paranoid)</code> با ارسال یک بسته در هر ۵ دقیقه برای دور زدن آستانه‌های تشخیص نفوذ (Thresholds).</p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>مبانی رایانش امن</span>
+        <span>بخش ۸: تکنیک‌های عبور از لایه‌های دفاعی</span>
+      </div>
+    </section>
+
+    <!-- اسلاید ۱۰: دیدگاه دفاعی بلو تیم -->
+    <section class="slide">
+      <div class="slide-header">
+        <div>
+          <span class="slide-tag">دیدگاه تیم مدافع (Blue Team)</span>
+          <h2 class="slide-title">رهگیری و مهار اسکنرهای Nmap در سطح شبکه</h2>
+        </div>
+        <span class="slide-badge">Detection & Hardening</span>
+      </div>
+      <div class="slide-content">
+        <div class="grid-2">
+          <div class="card card-accent-blue">
+            <h3>شناسایی توسط سامانه‌های IDS (Snort / Suricata)</h3>
+            <p>نوشتن قوانین دقیق برای کشف فلگ‌های غیرمتعارف در سطح شبکه:</p>
+            <div class="code-box" style="font-size: 0.8rem;">
+              alert tcp any any -> $HOME_NET any (<br>
+              &nbsp;&nbsp;msg:"SCAN Nmap Xmas Detected";<br>
+              &nbsp;&nbsp;flags:FPU;<br>
+              &nbsp;&nbsp;sid:1000001; rev:1;<br>
+              )
+            </div>
+          </div>
+          <div class="card card-accent-cyan">
+            <h3>راهکارهای سخت‌سازی سیستم (Hardening)</h3>
+            <ul>
+              <li><strong>فایروال‌های Stateful:</strong> رصد دقیق وضعیت کانکشن و مسدودسازی فلگ‌های نامتقارن.</li>
+              <li><strong>پورت اسپوفینگ و Tarpit:</strong> ابزارهایی مانند <em>Portspoof</em> که به تمام پورت‌ها پاسخ مثبت می‌دهند تا اسکنر را در لوپ باطل گرفتار کنند.</li>
+              <li><strong>مدیریت ICMP:</strong> محدودسازی یا مسدودسازی پیام‌های بازگشتی Unreachable در سطح هسته.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>مبانی رایانش امن</span>
+        <span>بخش ۹: استراتژی‌های دفاعی</span>
+      </div>
+    </section>
+
+    <!-- اسلاید ۱۱: نتیجه‌گیری و سوال تعاملی -->
+    <section class="slide">
+      <div class="slide-header">
+        <div>
+          <span class="slide-tag">جمع‌بندی و نتیجه‌گیری نهایی</span>
+          <h2 class="slide-title">نتیجه‌گیری و پرسش تعاملی کلاسی</h2>
+        </div>
+        <span class="slide-badge">Final Q & A</span>
+      </div>
+      <div class="slide-content">
+        <div class="card card-accent-cyan" style="padding: 2rem;">
+          <h3 style="color: #fff; font-size: 1.4rem;">پیام پایانی رایانش امن:</h3>
+          <p style="font-size: 1.05rem; line-height: 1.8; color: var(--text-muted); margin-bottom: 1.5rem;">
+            ابزار Nmap تجسم واقعی تئوری شبکه در صحنه عمل است. تسلط بر Nmap یعنی تسلط بر پشته TCP/IP، استانداردهای RFC و درک عمیق از خطاهای رفتاری سیستم‌عامل‌ها در برابر بسته‌های غیرعادی. در امنیت شبکه: <em>«شما نمی‌توانید از چیزی که نمی‌شناسید، دفاع کنید.»</em>
+          </p>
+          <div style="background: rgba(0, 255, 204, 0.08); border-right: 4px solid var(--primary); padding: 1.2rem; border-radius: 6px;">
+            <h4 style="color: var(--primary); margin-bottom: 0.4rem;">❓ پرسش تحلیلی برای کلاس:</h4>
+            <p style="color: #ffffff; font-weight: 600;">
+              اگر یک سیستم‌عامل، بسته‌های ناقص ارسالی در اسکن Xmas را دور بریزد (Drop) اما فایروال قبل از آن هم بسته‌ها را Drop کند، چگونه می‌توان تفکیک کرد که پورت واقعاً باز است یا پشت فایروال مسدود شده است؟
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>با سپاس از توجه استاد محترم و هم‌کلاسی‌های گرامی</span>
+        <span>پایان ارائه • پرسش و پاسخ</span>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- کنترل‌های کیبورد و دکمه‌های مینیمال -->
+  <div class="nav-controls">
+    <button class="nav-btn" id="prevBtn" title="اسلاید قبلی">➔</button>
+    <span class="page-indicator" id="indicator">01 / 11</span>
+    <button class="nav-btn" id="nextBtn" title="اسلاید بعدی">⬅</button>
+  </div>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const indicator = document.getElementById('indicator');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    let currentIndex = 0;
+
+    function updateSlide(index) {
+      slides.forEach((slide, i) => {
+        slide.classList.toggle('active', i === index);
+      });
+      const currentNum = String(index + 1).padStart(2, '0');
+      const totalNum = String(slides.length).padStart(2, '0');
+      indicator.textContent = `${currentNum} / ${totalNum}`;
+    }
+
+    function nextSlide() {
+      if (currentIndex < slides.length - 1) {
+        currentIndex++;
+        updateSlide(currentIndex);
+      }
+    }
+
+    function prevSlide() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateSlide(currentIndex);
+      }
+    }
+
+    // کنترل با کیبورد
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft' || e.key === 'PageDown' || e.key === ' ') {
+        nextSlide();
+      } else if (e.key === 'ArrowRight' || e.key === 'PageUp') {
+        prevSlide();
+      }
+    });
+
+    nextBtn.addEventListener('click', nextSlide);
+    prevBtn.addEventListener('click', prevSlide);
+  </script>
+</body>
+</html>
